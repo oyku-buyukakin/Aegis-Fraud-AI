@@ -1,10 +1,16 @@
-# Aegis Fraud AI
+<p align="center">
+  <img src="docs/aegis_fraud_ai_dashboard_showcase.png" alt="Aegis Fraud AI Dashboard" width="100%">
+</p>
 
-End-to-end fraud detection platform built on the [IEEE-CIS Fraud Detection](https://www.kaggle.com/c/ieee-fraud-detection) dataset.
 
-The system combines classical ML models, rule-based explainability, a RAG knowledge base (lightweight local RAG prototype), a multi-agent orchestration layer, and a production-ready FastAPI.
+End-to-end fraud risk scoring platform with anomaly detection, explainability, RAG, rule engine, multi-agent orchestration, and FastAPI.
 
-*For easier GitHub viewing, Markdown exports of the notebooks are available under `notebooks_md/`.
+This project was built on the IEEE-CIS Fraud Detection dataset as an AI-supported fraud and anomaly detection case study.
+
+
+For easier Github viewing, Markdown exports of the notebooks are available under notebook_md.
+
+
 ---
 
 ## Project Structure
@@ -73,7 +79,6 @@ Aegis-Fraud-AI-1/
 
 ## Notebook Pipeline
 
-Run notebooks in order. Each notebook reads the output of the previous one from `data/interim/`.
 
 | # | Notebook | Input | Output |
 |---|----------|-------|--------|
@@ -183,25 +188,6 @@ Dashboard: `http://127.0.0.1:8000/` · Swagger: `http://127.0.0.1:8000/docs`
 | POST | `/rules/evaluate` | Evaluate all fraud rules against feature dict |
 | POST | `/rag/query` | Search the knowledge base with a free-text query |
 | GET | `/health` | Server health + rules/KB/model metadata |
-
-### Example: `/score`
-
-```bash
-curl -X POST http://127.0.0.1:8000/score \
-  -H "Content-Type: application/json" \
-  -d '{
-    "transaction_id": "TXN-001",
-    "TransactionAmt": 875.00,
-    "hour": 2,
-    "account_age_days": 1,
-    "num_txn_last_1h": 9,
-    "P_emaildomain": "protonmail.com",
-    "card_type": "credit",
-    "country_mismatch": 1
-  }'
-```
-
-> `device_trust_score` is optional (defaults to `0.5`).
 
 ---
 

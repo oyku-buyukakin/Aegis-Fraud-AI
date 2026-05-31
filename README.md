@@ -4,6 +4,7 @@ End-to-end fraud detection platform built on the [IEEE-CIS Fraud Detection](http
 
 The system combines classical ML models, rule-based explainability, a RAG knowledge base (lightweight local RAG prototype), a multi-agent orchestration layer, and a production-ready FastAPI.
 
+*For easier GitHub viewing, Markdown exports of the notebooks are available under `notebooks_md/`.
 ---
 
 ## Project Structure

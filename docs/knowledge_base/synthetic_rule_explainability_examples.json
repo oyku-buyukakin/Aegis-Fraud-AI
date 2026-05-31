@@ -1,0 +1,63 @@
+[
+  {
+    "case_name":"high_risk_night",
+    "rule_base_score":0.82,
+    "rule_adjusted_score":0.82,
+    "rule_fired_count":10,
+    "rule_max_severity":"CRITICAL",
+    "rule_final_action":"FLAG_CRITICAL_REVIEW",
+    "rule_rule_ids":[
+      "RULE_001",
+      "RULE_002",
+      "RULE_003",
+      "RULE_004",
+      "RULE_005",
+      "RULE_006",
+      "RULE_007",
+      "RULE_008",
+      "RULE_009",
+      "RULE_010"
+    ],
+    "rule_rule_names":[
+      "Extreme Composite Anomaly Risk",
+      "High-Risk Entity with Strong Context Risk",
+      "Outlier with Very Strong Model Risk",
+      "Extreme Amount Deviation",
+      "Off-Hours Strong Fraud Signal",
+      "Product Amount Spike with High Risk",
+      "High Global Amount Ratio with High Risk",
+      "Dense Anomaly Pattern",
+      "New Account Velocity Risk",
+      "Night Transaction with Untrusted Entity"
+    ],
+    "rule_explanations":[
+      "Very high anomaly score combined with many high anomaly flags. This is the strongest high-precision fraud segment.\n",
+      "Entity is high-risk and transaction context risk is also high. This captures suspicious repeat entity behavior.\n",
+      "Transaction is a statistical outlier and the anomaly score is already high.\n",
+      "Transaction amount is extremely unusual and the anomaly score is high.\n",
+      "Transaction occurred outside business hours with high anomaly score and dense anomaly signals.\n",
+      "Transaction amount is far above product-level average and the anomaly score is high.\n",
+      "Transaction amount is much higher than the global median and the anomaly score is high.\n",
+      "Multiple anomaly signals fired together while the anomaly score is high.\n",
+      "Transaction originated from a very new account (first transaction within the last 2 hours) with a notable anomaly score. Mimics a velocity check: fraudsters often open accounts and transact immediately.\n",
+      "Transaction occurred at night and the entity trust score is very low. Combines temporal risk (off-hours activity typical of foreign \/ automated fraud) with a low-trust entity profile.\n"
+    ]
+  },
+  {
+    "case_name":"low_risk_daytime",
+    "rule_base_score":0.12,
+    "rule_adjusted_score":0.12,
+    "rule_fired_count":0,
+    "rule_max_severity":"NONE",
+    "rule_final_action":"PASS",
+    "rule_rule_ids":[
+
+    ],
+    "rule_rule_names":[
+
+    ],
+    "rule_explanations":[
+
+    ]
+  }
+]

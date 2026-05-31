@@ -1,0 +1,42 @@
+priority_mechanism:
+  description: >
+    If multiple fraud rules are triggered for the same transaction, the rule
+    engine selects the final decision according to rule priority, severity,
+    and action hierarchy. Lower priority values indicate stronger rules.
+
+  priority_order:
+    rule_priority: ascending
+    severity_rank: descending
+    fraud_action_rank: descending
+
+  tie_breaking:
+    - "Select the rule with the lowest priority value."
+    - "If priorities are equal, select the rule with the highest severity."
+    - "If severity is also equal, select the strongest action."
+    - "If all are equal, keep all matched rules for explainability."
+
+  final_rule_selection:
+    selected_rule: "highest_priority_matched_rule"
+    keep_all_matched_rules: true
+    max_rules_per_transaction: 5
+
+severity_rank:
+  CRITICAL: 4
+  HIGH: 3
+  MEDIUM: 2
+  LOW: 1
+  NONE: 0
+
+action_rank:
+  FLAG_CRITICAL_REVIEW: 3
+  FLAG_REVIEW: 2
+  MONITOR: 1
+  PASS: 0
+
+conflict_resolution:
+  boost_strategy: disabled
+  action_strategy: highest_priority
+  severity_strategy: highest_severity
+  final_action_strategy: highest_ranked_action
+  max_rules_per_transaction: 5
+  score_cap: 1.0

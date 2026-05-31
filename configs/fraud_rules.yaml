@@ -1,0 +1,270 @@
+metadata:
+  version: "1.0"
+  last_updated: "2026-05-29"
+  description: "High-precision fraud rule engine for explainability and review prioritization"
+  base_score_col: "adjusted_anomaly_score"
+  output_score_col: "rule_adjusted_score"
+  score_cap: 1.0
+
+rules:
+
+  - id: RULE_001
+    name: "Extreme Composite Anomaly Risk"
+    description: >
+      Very high anomaly score combined with many high anomaly flags.
+      This is the strongest high-precision fraud segment.
+    priority: 1
+    severity: CRITICAL
+    logic: AND
+    conditions:
+      - field: adjusted_anomaly_score
+        operator: gte
+        value: 0.78
+      - field: anomaly_high_flag_count
+        operator: gte
+        value: 10
+    score_boost: 0.0
+    tags: [anomaly, composite, high_precision]
+    action: FLAG_CRITICAL_REVIEW
+    explanation_template: >
+      Adjusted anomaly score is {adjusted_anomaly_score:.3f} and
+      {anomaly_high_flag_count} high anomaly flags fired. This indicates a
+      strong composite fraud signal.
+
+  - id: RULE_002
+    name: "High-Risk Entity with Strong Context Risk"
+    description: >
+      Entity is high-risk and transaction context risk is also high.
+      This captures suspicious repeat entity behavior.
+    priority: 2
+    severity: CRITICAL
+    logic: AND
+    conditions:
+      - field: is_high_risk_entity
+        operator: eq
+        value: 1
+      - field: final_context_anomaly_score
+        operator: gte
+        value: 0.75
+      - field: adjusted_anomaly_score
+        operator: gte
+        value: 0.70
+    score_boost: 0.0
+    tags: [entity, context, anomaly]
+    action: FLAG_CRITICAL_REVIEW
+    explanation_template: >
+      Entity is marked as high-risk, context anomaly score is
+      {final_context_anomaly_score:.3f}, and adjusted anomaly score is
+      {adjusted_anomaly_score:.3f}.
+
+  - id: RULE_003
+    name: "Outlier with Very Strong Model Risk"
+    description: >
+      Transaction is a statistical outlier and the anomaly score is already high.
+    priority: 3
+    severity: CRITICAL
+    logic: AND
+    conditions:
+      - field: is_outlier
+        operator: eq
+        value: 1
+      - field: adjusted_anomaly_score
+        operator: gte
+        value: 0.70
+    score_boost: 0.0
+    tags: [outlier, anomaly, model_score]
+    action: FLAG_CRITICAL_REVIEW
+    explanation_template: >
+      Transaction is marked as an outlier and adjusted anomaly score is
+      {adjusted_anomaly_score:.3f}.
+
+  - id: RULE_004
+    name: "Extreme Amount Deviation"
+    description: >
+      Transaction amount is extremely unusual and the anomaly score is high.
+    priority: 4
+    severity: CRITICAL
+    logic: AND
+    conditions:
+      - field: ctx_amount_zscore
+        operator: gt
+        value: 4.0
+      - field: adjusted_anomaly_score
+        operator: gte
+        value: 0.70
+    score_boost: 0.0
+    tags: [amount, zscore, anomaly]
+    action: FLAG_CRITICAL_REVIEW
+    explanation_template: >
+      Amount z-score is {ctx_amount_zscore:.2f} and adjusted anomaly score is
+      {adjusted_anomaly_score:.3f}. The transaction amount is highly unusual.
+
+  - id: RULE_005
+    name: "Off-Hours Strong Fraud Signal"
+    description: >
+      Transaction occurred outside business hours with high anomaly score and
+      dense anomaly signals.
+    priority: 5
+    severity: HIGH
+    logic: AND
+    conditions:
+      - field: is_business_hour
+        operator: eq
+        value: 0
+      - field: adjusted_anomaly_score
+        operator: gte
+        value: 0.75
+      - field: anomaly_high_flag_ratio
+        operator: gt
+        value: 0.25
+    score_boost: 0.0
+    tags: [time, off_hours, anomaly]
+    action: FLAG_REVIEW
+    explanation_template: >
+      Transaction occurred outside business hours with adjusted anomaly score
+      {adjusted_anomaly_score:.3f} and anomaly flag ratio
+      {anomaly_high_flag_ratio:.2f}.
+
+  - id: RULE_006
+    name: "Product Amount Spike with High Risk"
+    description: >
+      Transaction amount is far above product-level average and the anomaly score
+      is high.
+    priority: 6
+    severity: HIGH
+    logic: AND
+    conditions:
+      - field: ctx_amount_vs_product_avg
+        operator: gt
+        value: 300
+      - field: TransactionAmt
+        operator: gt
+        value: 200
+      - field: adjusted_anomaly_score
+        operator: gte
+        value: 0.70
+    score_boost: 0.0
+    tags: [product, amount, context]
+    action: FLAG_REVIEW
+    explanation_template: >
+      Transaction amount is significantly above the product-level average.
+      Transaction amount is {TransactionAmt:.2f} and adjusted anomaly score is
+      {adjusted_anomaly_score:.3f}.
+
+  - id: RULE_007
+    name: "High Global Amount Ratio with High Risk"
+    description: >
+      Transaction amount is much higher than the global median and the anomaly
+      score is high.
+    priority: 7
+    severity: HIGH
+    logic: AND
+    conditions:
+      - field: ctx_amount_ratio_to_global_median
+        operator: gt
+        value: 5.0
+      - field: adjusted_anomaly_score
+        operator: gte
+        value: 0.70
+    score_boost: 0.0
+    tags: [amount, global_median, context]
+    action: FLAG_REVIEW
+    explanation_template: >
+      Transaction amount is {ctx_amount_ratio_to_global_median:.2f} times the
+      global median and adjusted anomaly score is {adjusted_anomaly_score:.3f}.
+
+  - id: RULE_008
+    name: "Dense Anomaly Pattern"
+    description: >
+      Multiple anomaly signals fired together while the anomaly score is high.
+    priority: 8
+    severity: HIGH
+    logic: AND
+    conditions:
+      - field: anomaly_high_flag_ratio
+        operator: gt
+        value: 0.35
+      - field: anomaly_high_flag_count
+        operator: gte
+        value: 8
+      - field: adjusted_anomaly_score
+        operator: gte
+        value: 0.68
+    score_boost: 0.0
+    tags: [anomaly, density]
+    action: FLAG_REVIEW
+    explanation_template: >
+      Anomaly flag ratio is {anomaly_high_flag_ratio:.2f},
+      {anomaly_high_flag_count} anomaly flags fired, and adjusted anomaly score
+      is {adjusted_anomaly_score:.3f}.
+
+  - id: RULE_009
+    name: "New Account Velocity Risk"
+    description: >
+      Transaction originated from a very new account (first transaction within
+      the last 2 hours) with a notable anomaly score. Mimics a velocity check:
+      fraudsters often open accounts and transact immediately.
+    priority: 9
+    severity: HIGH
+    logic: AND
+    conditions:
+      - field: time_since_first_transaction
+        operator: lt
+        value: 7200
+      - field: adjusted_anomaly_score
+        operator: gte
+        value: 0.65
+    score_boost: 0.0
+    tags: [velocity, new_account, temporal]
+    action: FLAG_REVIEW
+    explanation_template: >
+      Account is very new (time since first transaction:
+      {time_since_first_transaction}s) and adjusted anomaly score is
+      {adjusted_anomaly_score:.3f}. Possible velocity fraud.
+
+  - id: RULE_010
+    name: "Night Transaction with Untrusted Entity"
+    description: >
+      Transaction occurred at night and the entity trust score is very low.
+      Combines temporal risk (off-hours activity typical of foreign / automated
+      fraud) with a low-trust entity profile.
+    priority: 10
+    severity: MEDIUM
+    logic: AND
+    conditions:
+      - field: is_night_transaction
+        operator: eq
+        value: 1
+      - field: entity_trusted_score
+        operator: lt
+        value: 0.30
+      - field: adjusted_anomaly_score
+        operator: gte
+        value: 0.60
+    score_boost: 0.0
+    tags: [night, entity, trust, foreign_proxy]
+    action: FLAG_REVIEW
+    explanation_template: >
+      Transaction occurred at night with entity trust score of
+      {entity_trusted_score:.2f} and adjusted anomaly score of
+      {adjusted_anomaly_score:.3f}. Low-trust entity active outside business
+      hours is a strong foreign/automated fraud signal.
+
+conflict_resolution:
+  boost_strategy: disabled
+  action_strategy: highest_priority
+  severity_strategy: highest_severity
+  max_rules_per_transaction: 5
+  score_cap: 1.0
+
+severity_rank:
+  CRITICAL: 4
+  HIGH: 3
+  MEDIUM: 2
+  LOW: 1
+
+actions:
+  FLAG_CRITICAL_REVIEW:
+    description: "Send transaction to critical fraud review queue"
+  FLAG_REVIEW:
+    description: "Send transaction to standard fraud review queue"
